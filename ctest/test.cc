@@ -3,13 +3,11 @@
 #include <time.h>
 #include <cstdlib>
 #include <fstream>
-#include <limits>
 #include <unistd.h>
 
 using namespace std;
 int main(){
 	vector<int> b(50);
-	cout<< numeric_limits<double>::min()<<endl;
 	/* FILE *fp;
 	int a[100];
 	fp = fopen("./data.txt","r");
@@ -40,24 +38,24 @@ int main(){
 	}
 	cout<<endl;
 	in.close();  */
-	fstream ofile;
-	ofile.open("./data5000.txt",ios::out|ios::trunc);
-	for(int i=0;i<5000;i++){
-		for(int j=0;j<5000;j++){
-			if(j == i) ofile<<4<<" ";
-			else if(j==i-1||j==i+1) ofile<<1<<" ";
-			else ofile<<0<<" ";
+	ofstream ofile;
+	ofile.open("./data3000.txt",ios::out|ios::trunc);
+	for(int i=0;i<3000;i++){
+		for(int j=0;j<3000;j++){
+			if(j==i) {ofile << 4<<" ";}
+			else if(j==i+1 || j==i-1) {ofile <<1<<" ";}
+			else ofile << 0<<" ";
 		}
 		ofile<<"\n";
 	}
-	ofile.close();
 	clock_t start, finish;
 	start = clock();
-	sleep(3);//<unistd.h>
+	//sleep(3);//<unistd.h>
     //cout<<time(NULL);
     //cout<<srand(time(NULL));
 	finish = clock();
 	cout << (double)(finish - start) / CLOCKS_PER_SEC;
-    system("pause");
+	char stop = getchar();
+    //system("pause");
     return 0;
 }

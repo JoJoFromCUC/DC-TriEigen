@@ -1,8 +1,8 @@
 ﻿import numpy as np 
 
-f = np.loadtxt('./data50.txt')
+f = np.loadtxt('./data67.txt')
 x = np.matrix(f)
-print (x)
+print x
 a = np.linalg.matrix_rank(x)
 print ('matrix rank:' , a)
 b = []
