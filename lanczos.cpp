@@ -26,7 +26,7 @@ void lanczos(SparseMatrix &A, vector<vector<double> > &P, vector<double> &alpha,
         for(int j=0;j<p.size();j++){
             P[j][i]=p[j];	//P的每一列都为p
         }
-        rightMultiply(A, p, v);	//v=A*A‘*P
+        rightMultiply(A, p, v);	//v=A*A'*P
         alpha[i]=dotProduct(p,v);
         if(i+1<rank){
             for(int j=0;j<m;j++){
@@ -40,7 +40,7 @@ void lanczos(SparseMatrix &A, vector<vector<double> > &P, vector<double> &alpha,
             }
         }
     }
-    FILE *fk = fopen("./ctest/P3000.txt","w");//写入正交矩阵P
+    FILE *fk = fopen("./ctest/P1000.txt","w");//写入正交矩阵P
 	for(int i=0;i<m;++i){
 		for(int j=0;j<rank;++j){
 			fprintf(fk,"%.16lf ",P[i][j]);
@@ -48,7 +48,7 @@ void lanczos(SparseMatrix &A, vector<vector<double> > &P, vector<double> &alpha,
 		fprintf(fk,"%s","\n");
 	}
 	fclose(fk);
-    FILE *fab = fopen("./ctest/ab3000.txt","w");//写入alpha
+    FILE *fab = fopen("./ctest/ab1000.txt","w");//写入alpha
 	for(int i=0;i<m;++i){
 		fprintf(fab,"%.16lf ",alpha[i]);	
 	}
@@ -59,13 +59,13 @@ void lanczos(SparseMatrix &A, vector<vector<double> > &P, vector<double> &alpha,
     cout<<"分解结果已写入文件\n"<<endl;
 }
 int main(){
-    int DIM = 3000;
+    int DIM = 1000;
     SparseMatrix A;
     A.rows = DIM;
     A.cols = DIM;
     cout<<"loading data..."<<endl;
     FILE *fp;
-    fp = fopen("./ctest/data3000.txt","r");
+    fp = fopen("./ctest/data1000.txt","r");
     if(!fp){
         cout<<"open file failed!"<<endl;
         return -1;

@@ -2,9 +2,6 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include <iomanip>
-#include <mpi.h>
-#include <cilk/reducer_opadd.h>
 
 using namespace std;
 
@@ -69,12 +66,12 @@ void multiply(const vector<vector<double> > &X,const vector<double> &v,vector<do
 
 //(level-1)
 double dotProduct(const vector<double> &a, const vector<double> &b){
-    //double res=0;
-    cilk::reducer< cilk::op_add<double> >res (0);
-    cilk_for(int i=0;i<a.size();i++){
-        *res += a[i]*b[i];
+    double res=0;
+    //cilk::reducer< cilk::op_add<double> >res (0);
+    for(int i=0;i<a.size();i++){
+        res += a[i]*b[i];
     }
-    return res.get_value();
+    return res;
 }
 
 //res= A*A'*v
@@ -148,21 +145,23 @@ void rightMultiply(const vector<vector<double> > &B,SparseMatrix &A, vector<vect
 
 //2范数
 double norm(const vector<double> &v){
-    cilk::reducer< cilk::op_add<double> >r (0);
+    //cilk::reducer< cilk::op_add<double> >r (0);
+	double r = 0;
     for(int i=0;i<v.size();i++)
-        *r += v[i]*v[i];
-    return sqrt(r.get_value());
+        r += v[i]*v[i];
+    return sqrt(r);
 }
 
 //归一化
 double normalize(vector<double> &v){
-    cilk::reducer< cilk::op_add<double> >r (0);
+    //cilk::reducer< cilk::op_add<double> >r (0);
+	double r = 0;
     for(int i=0;i<v.size();i++){
-        *r += v[i]*v[i];
+        r += v[i]*v[i];
     }
-    double R = sqrt(r.get_value());
+    double R = sqrt(r);
     if(R > EPS){
-        cilk_for(int i=0;i<v.size();i++){
+        for(int i=0;i<v.size();i++){
             v[i] /= R;
         }
     }
@@ -171,7 +170,7 @@ double normalize(vector<double> &v){
 
 //数乘
 void multiply(vector<double> &v, double d){
-    cilk_for(int i=0;i<v.size();i++){
+    for(int i=0;i<v.size();i++){
         v[i] *= d;
     }
 }
@@ -180,15 +179,15 @@ void multiply(vector<double> &v, double d){
 void randUnitVector(int n, vector<double> &v){
     v.clear();v.resize(n);
     while(true){
-        //double r=0;
-        cilk::reducer< cilk::op_add<double> >r (0);
+        double r=0;
+        //cilk::reducer< cilk::op_add<double> >r (0);
         for(int i=0;i<n;i++){
             v[i]= i % 9;
-            *r += v[i]*v[i];
+            r += v[i]*v[i];
         }
-        double R = sqrt(r.get_value());
+        double R = sqrt(r);
         if(R>EPS){
-            cilk_for(int i=0;i<n;i++){
+            for(int i=0;i<n;i++){
                 v[i]/=R;
             }
             break;

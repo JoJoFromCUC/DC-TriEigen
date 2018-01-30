@@ -7,9 +7,10 @@ license：GPL 3.0
 #include <iostream>
 #include <time.h>
 #include <fstream>
-#include <mpi.h>
+#include <iomanip>
 #include "func.h"
 #define DIM 1000
+using namespace std;
 
 int main(int argc,char *argv[]){
     cout.precision(15);
@@ -51,8 +52,8 @@ int main(int argc,char *argv[]){
         	cout<<endl;
     	}
 		cout<<endl;  */
-	vector<double> alpha;
-	vector<double> beta;
+	vector<double> alpha(DIM,0);
+	vector<double> beta(DIM-1,0);
 	vector<vector<double> > Q;
     vector<double> D; 
 	ifstream in("./ctest/ab1000.txt");//读取主对角、副对角元素
@@ -66,10 +67,13 @@ int main(int argc,char *argv[]){
 		D.push_back(temp);
 	}
 	in.close();
-	for(int i=0;i<DIM;i++){
-		alpha.push_back(D[i]);
-		beta.push_back(D[i+DIM]);
+	cout<<"D size:"<<D.size()<<endl;;
+	for(int i=0;i<DIM-1;i++){
+		alpha[i] = D[i];
+		beta[i] = D[i+DIM];
 	}
+	cout<<beta[0]<<endl<<beta[DIM-1];
+	alpha[DIM-1] = D[DIM-1];
 	D.clear();
 	cout<<"alpha.size: "<<alpha.size()<<endl
 		<<"beta.size: "<<beta.size()<<endl;	

@@ -2,9 +2,8 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include <iomanip>
 #include <fstream>
-using namespace std;
+
 
 //特征方程求解
 vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, double sigma,int start,int end){
@@ -85,11 +84,11 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
         return;
     }else{
         int mid=(start+end)/2;  //划分
-        alpha[mid]-=beta[mid+1];  //统一协调秩1修补矩阵
+        alpha[mid]-=beta[mid+1];  //统一协调秩1修正矩阵
         alpha[mid+1]-=beta[mid+1];
-	    cilk_spawn DCSub(alpha,beta,Q,D,start,mid);  //递归
-        cilk_spawn DCSub(alpha,beta,Q,D,mid+1,end);
-	    cilk_sync;
+	     DCSub(alpha,beta,Q,D,start,mid);  //递归
+         DCSub(alpha,beta,Q,D,mid+1,end);
+	    //cilk_sync;
         int n=end-start+1;//矩阵规模
         vector<double> z(n,0);
         for(int i=start;i<=mid;i++)  //构造向量z=(q1',q2')
@@ -111,7 +110,7 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
 		cout<<"lambda completed ."<<endl;	
         //对块内每个特征值计算局部特征向量 p = (D-\lambda I)^{-1} *z
         vector<vector<double> > P(n,vector<double>(n));//局部特征向量矩阵
-        cilk_for(int i=0;i<n;i++){
+        for(int i=0;i<n;i++){
             vector<double> p(n);
             for(int j=0;j<n;j++){
                 double tem = D[j+start]-lambda[i];
@@ -135,7 +134,7 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
                 oldQ[i][j]=Q[i+start][j+start];
             }
         }       
-        cilk_for(int i=0;i<n;i++){	//更新当前Q矩阵
+        for(int i=0;i<n;i++){	//更新当前Q矩阵
             for(int j=0;j<n;j++){
                 Q[i+start][j+start]=0;
                 for(int k=0;k<n;k++){
@@ -191,6 +190,9 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
                 W[i][j]=Q[i][index[j]];	//改变原Q的顺序赋给W
             }
         }
+		for(int i=0;i<m;i++){
+			cout<<W[0][i]<<endl;
+		}
         //load file P
         FILE *fc ;
         cout<<"read standard matrix :"<<endl;
@@ -221,7 +223,7 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         rightMultiply(U,A,V); //V=U'*A
         cout<<"calculating V completed ."<<endl;
         s.clear();s.resize(r,0);
-        cilk_for(int i=0;i<r;i++){	//归一化
+        for(int i=0;i<r;i++){	//归一化
             for(int j=0;j<n;j++){
                 s[i]+=V[j][i]*V[j][i];
             }
@@ -236,30 +238,19 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         for(int i=0;i<s.size();i++){
             cout<<s[i]<<endl;
         }
-        // FILE *fp = fopen("./result.txt","w");//写入特征向量矩阵U
-        // int rows = U.size(),cols = U[0].size();
-        // fprintf(fp,"%s","特征向量矩阵为:\n");
-        // for(int i=0;i<rows;++i){
-        //     for(int j=0;j<cols;++j){
-        //         fprintf(fp,"%.15lf ",U[i][j]);
-        //     }
-        //     fprintf(fp,"%s","\n");
-        // }
-        // fclose(fp);
-        // cout<<"特征向量矩阵已写入result.txt文件!\n"<<endl;
-        //print(U);
-        cout<<endl;
-        /* fp = fopen("./ctest/result.txt","a");//写入矩阵V
-        rows = V.size(),cols = V[0].size();
-        fprintf(fp,"%s","V矩阵为:\n");
+         FILE *fp = fopen("./result.txt","w");//写入特征向量矩阵U
+        int rows = U.size(),cols = U[0].size();
+        fprintf(fp,"%s","特征向量矩阵为:\n");
         for(int i=0;i<rows;++i){
             for(int j=0;j<cols;++j){
-                fprintf(fp,"%f ",V[i][j]);
+                fprintf(fp,"%.15lf ",U[i][j]);
             }
-            fprintf(fp,"%c",'\n');
+            fprintf(fp,"%s","\n");
         }
         fclose(fp);
-        cout<<"V 矩阵已写入result.txt文件!"<<endl; */
-        //print(V);
+        cout<<"特征向量矩阵已写入result.txt文件!\n"<<endl; 
+        //print(U);
+        cout<<endl;
+        
     }
 }

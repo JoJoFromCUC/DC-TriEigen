@@ -2,8 +2,6 @@
 #define FUNC_H
 #include <vector>
 #include <string>
-#include <cilk/cilk.h>
-#include <mpi.h>
 using namespace std;
 
 extern double EPS ; //精度
@@ -36,35 +34,6 @@ public:
         return cells[cellID++];
     }
 };
-
-
-void resolve(SparseMatrix &A,int r,vector<double> &alpha,vector<double> &beta);
-
-void print(vector<vector<double> > &A);//打印矩阵
-
-void multiply(vector<vector<double> > &A,vector<vector<double> > &B,vector<vector<double> > &C);
-
-void multiply(const vector<vector<double> > &X,const vector<double> &v,vector<double> &res);
-
-void rightMultiply(SparseMatrix &A, const vector<double> &v, vector<double> &res);
-
-void rightMultiply(const vector<vector<double> > &B,SparseMatrix &A, vector<vector<double> > &C);
-
-double normalize(vector<double> &v);
-
-double prezero(double num);
-
-void multiply(vector<double> &v, double d);
-
-void randUnitVector(int n, vector<double> &v);
-
-double norm(const vector<double> &v);
-
-double dotProduct(const vector<double> &a, const vector<double> &b);
-
-// bool read_data(double local_a[],int local_n,int n,string vec_name,int myrank,MPI_Comm comm);
-
-// bool print_data(double local_a[],int local_n,int n,string title,int myrank,MPI_Comm comm);
 
 template <class T>
 void combine(vector<T> &v,int left,int m,int right,vector<int> &index){//归并排序
@@ -113,4 +82,32 @@ void merge_sort(vector<T> v,vector<int> &index){
     for(int i=0;i<v.size();i++) index[i]=i;
     merge_sort(v,0,v.size()-1,index);
 }
+
+void resolve(SparseMatrix &A,int r,vector<double> &alpha,vector<double> &beta);
+
+void print(vector<vector<double> > &A);//打印矩阵
+
+void multiply(vector<vector<double> > &A,vector<vector<double> > &B,vector<vector<double> > &C);
+
+void multiply(const vector<vector<double> > &X,const vector<double> &v,vector<double> &res);
+
+void rightMultiply(SparseMatrix &A, const vector<double> &v, vector<double> &res);
+
+void rightMultiply(const vector<vector<double> > &B,SparseMatrix &A, vector<vector<double> > &C);
+
+double normalize(vector<double> &v);
+
+double prezero(double num);
+
+void multiply(vector<double> &v, double d);
+
+void randUnitVector(int n, vector<double> &v);
+
+double norm(const vector<double> &v);
+
+double dotProduct(const vector<double> &a, const vector<double> &b);
+
+// bool read_data(double local_a[],int local_n,int n,string vec_name,int myrank,MPI_Comm comm);
+
+// bool print_data(double local_a[],int local_n,int n,string title,int myrank,MPI_Comm comm);
 #endif
