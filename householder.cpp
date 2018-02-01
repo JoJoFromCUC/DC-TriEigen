@@ -94,7 +94,7 @@ for (i = 0; i < n; i++){
 		}
 	}   
 }
-FILE *fp = fopen("./data500.txt","r");
+FILE *fp = fopen("./ctest/data500.txt","r");
 if(!fp){
 	cout<<" open matrix file failed!"<<endl;
 }
@@ -166,12 +166,13 @@ for (k = 0; k < (n-2); k++){
 	cout<<"正交矩阵已写入p.txt文件!\n"<<endl; 
 	
 	cout << "the result is :" << endl;
-	FILE *ft = fopen("./ab500.txt","w");//写入正交矩阵
+	FILE *ft = fopen("./ab500.txt","w");//写入三对角矩阵元素
 	for(int i=0;i<n;++i){
 		for(int j=0;j<n;++j){
 			if(j==i) fprintf(ft,"%.15lf ",a[i][j]);
 		}
 	}
+	fprintf(ft,"%.15lf ",0);
 	for(int i=0;i<n;++i){
 		for(int j=0;j<n;++j){
 			if(j==i+1) fprintf(ft,"%.15lf ",a[i][j]);

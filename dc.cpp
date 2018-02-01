@@ -134,7 +134,7 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
                 oldQ[i][j]=Q[i+start][j+start];
             }
         }       
-        for(int i=0;i<n;i++){	//更新当前Q矩阵
+        for(int i=0;i<n;i++){	//update Q
             for(int j=0;j<n;j++){
                 Q[i+start][j+start]=0;
                 for(int k=0;k<n;k++){
@@ -143,7 +143,7 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
             }
         }
 		cout<<"Q updating completed."<<endl;
-        //更新特征值
+        //Update D
         for(int i=0;i<n;i++){
 			D[i+start]=lambda[i];
 		}	
@@ -166,7 +166,7 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
     int m=A.rows;
     int n=A.cols;
     //lanczos: A*A'=P*T*P'
-    if(m<=n){
+    if(m==n){
         int l=m;
         vector<vector<double> > P(m,vector<double>(r,0));
         vector<vector<double> > U,V;
@@ -190,13 +190,14 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
                 W[i][j]=Q[i][index[j]];	//改变原Q的顺序赋给W
             }
         }
-		for(int i=0;i<m;i++){
-			cout<<W[0][i]<<endl;
-		}
+        //print(W);
+		// for(int i=0;i<m;i++){
+		// 	cout<<W[0][i]<<endl;
+		// }
         //load file P
         FILE *fc ;
         cout<<"read standard matrix :"<<endl;
-        fc = fopen("./ctest/P1000.txt","r");
+        fc = fopen("./ctest/P500.txt","r");
 		if(!fc){
 			cout<<"open P file failed!"<<endl;
 		}
@@ -221,36 +222,39 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         V.clear();V.resize(n,vector<double>(r));
         cout<<"calculating V..."<<endl;
         rightMultiply(U,A,V); //V=U'*A
-        cout<<"calculating V completed ."<<endl;
+        cout<<"get eigenvalues ready ..."<<endl;
         s.clear();s.resize(r,0);
         for(int i=0;i<r;i++){	//归一化
             for(int j=0;j<n;j++){
                 s[i]+=V[j][i]*V[j][i];
             }
             s[i]=sqrt(s[i]);
-            if(s[i]>EPS){
-                for(int j=0;j<n;j++){
-                    V[j][i] /= s[i];
-                }
-            }
+            // if(s[i]>EPS){
+            //     for(int j=0;j<n;j++){
+            //         V[j][i] /= s[i];
+            //     }
+            // }
         }
         cout<<"eigen values :"<<endl;//输出特征值
         for(int i=0;i<s.size();i++){
             cout<<s[i]<<endl;
         }
-         FILE *fp = fopen("./result.txt","w");//写入特征向量矩阵U
-        int rows = U.size(),cols = U[0].size();
-        fprintf(fp,"%s","特征向量矩阵为:\n");
-        for(int i=0;i<rows;++i){
-            for(int j=0;j<cols;++j){
-                fprintf(fp,"%.15lf ",U[i][j]);
-            }
-            fprintf(fp,"%s","\n");
-        }
-        fclose(fp);
-        cout<<"特征向量矩阵已写入result.txt文件!\n"<<endl; 
+        // FILE *fp = fopen("./result.txt","w");//写入特征向量矩阵U
+        // int rows = U.size(),cols = U[0].size();
+        // fprintf(fp,"%s","特征向量矩阵为:\n");
+        // for(int i=0;i<rows;++i){
+        //     for(int j=0;j<cols;++j){
+        //         fprintf(fp,"%.15lf ",U[i][j]);
+        //     }
+        //     fprintf(fp,"%s","\n");
+        // }
+        // fclose(fp);
+        // cout<<"特征向量矩阵已写入result.txt文件!\n"<<endl; 
         //print(U);
         cout<<endl;
         
+    }
+    else{
+        cout<<"the input matrix is illegal"<<endl;
     }
 }

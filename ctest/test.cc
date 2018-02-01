@@ -39,14 +39,21 @@ int main(){
 	cout<<endl;
 	in.close();  */
 	ofstream ofile;
-	ofile.open("./data3000.txt",ios::out|ios::trunc);
-	for(int i=0;i<3000;i++){
-		for(int j=0;j<3000;j++){
+	ofile.open("./AB500.txt",ios::out|ios::trunc);
+	/* for(int i=0;i<500;i++){
+		for(int j=0;j<500;j++){
 			if(j==i) {ofile << 4<<" ";}
 			else if(j==i+1 || j==i-1) {ofile <<1<<" ";}
 			else ofile << 0<<" ";
 		}
 		ofile<<"\n";
+	} */
+	for(int i=0;i<500;i++){
+		ofile << 4 <<" ";
+	}
+	ofile << 0 <<" ";
+	for(int j=0;j<499;j++){
+		ofile << 1 <<" ";
 	}
 	clock_t start, finish;
 	start = clock();

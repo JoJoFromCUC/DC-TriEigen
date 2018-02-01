@@ -2,10 +2,11 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <ctime>
 
 using namespace std;
 
-double EPS = 1e-12;
+double EPS = 1e-14;
 double ZERO = 1e-6;
 
 //转置
@@ -117,7 +118,9 @@ void rightMultiply(const vector<vector<double> > &B,SparseMatrix &A, vector<vect
     int m=B[0].size();
     int k=B.size();
     int n=A.cols;
-    for(int i=0;i<C.size();i++) fill(C[i].begin(),C[i].end(),0);
+    for(int i=0;i<C.size();i++){
+        fill(C[i].begin(),C[i].end(),0);
+    }
     A.moveFirst();
     while(A.hasNext()){
         Cell c=A.next();
@@ -175,27 +178,29 @@ void multiply(vector<double> &v, double d){
     }
 }
 
-//随机单位向量
+//random standard vector gen
 void randUnitVector(int n, vector<double> &v){
+    srand(time(NULL));
     v.clear();v.resize(n);
     while(true){
         double r=0;
         //cilk::reducer< cilk::op_add<double> >r (0);
-        for(int i=0;i<n;i++){
-            v[i]= i % 9;
+        for(int i=1;i<n;i++){
+            // v[i]= i % 10-5;
+            v[i] = rand()*1.0/RAND_MAX - 0.5;
             r += v[i]*v[i];
         }
-        double R = sqrt(r);
-        if(R>EPS){
+        r = sqrt(r);
+        if(r > EPS){
             for(int i=0;i<n;i++){
-                v[i]/=R;
+                v[i]/=r;
             }
             break;
         }
     }
 }
 
-//打印输出
+//print matrix
 void print(vector<vector<double> > &X){
     cout.precision(6);
     cout.setf(ios::fixed);
@@ -207,7 +212,7 @@ void print(vector<vector<double> > &X){
     }
     cout<<endl;
 }
-//避免除0操作
+//deal with 0 problem
 double prezero(double num){
 	return num = num==0?ZERO:num;
 }

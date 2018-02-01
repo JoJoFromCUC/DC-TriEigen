@@ -1,4 +1,4 @@
-﻿/*
+/*
 author: JoeZhu
 time: Oct 2nd,2017
 institution: UCAS
@@ -9,7 +9,7 @@ license：GPL 3.0
 #include <fstream>
 #include <iomanip>
 #include "func.h"
-#define DIM 1000
+#define DIM 500
 using namespace std;
 
 int main(int argc,char *argv[]){
@@ -29,17 +29,17 @@ int main(int argc,char *argv[]){
 	//读入矩阵数据
 	cout<<"loading data..."<<endl;
 	FILE *fp;
-	fp = fopen("./ctest/data1000.txt","r");
+	fp = fopen("./ctest/data500.txt","r");
 	if(!fp){
 		cout<<" open matrix file failed!"<<endl;
 		return -1;
 	}
 	for(int i=0;i<A.rows;i++){
 		int tmp;
-			for(int j=0;j<A.cols;j++){
-				if(fscanf(fp,"%d",&tmp) == EOF) break; 
-					A.cells.push_back(Cell(i,j,tmp));
-			}
+		for(int j=0;j<A.cols;j++){
+			if(fscanf(fp,"%d",&tmp) == EOF) break; 
+			A.cells.push_back(Cell(i,j,tmp));
+		}
 		if(feof(fp)) break;
 	}
 	fclose(fp);
@@ -53,10 +53,10 @@ int main(int argc,char *argv[]){
     	}
 		cout<<endl;  */
 	vector<double> alpha(DIM,0);
-	vector<double> beta(DIM-1,0);
+	vector<double> beta(DIM,0);
 	vector<vector<double> > Q;
     vector<double> D; 
-	ifstream in("./ctest/ab1000.txt");//读取主对角、副对角元素
+	ifstream in("./ctest/ab500.txt");//读取主对角、副对角元素
 	if(!in){
 		cout<<" open tri elements file failed!"<<endl;
 		return -1;
@@ -68,13 +68,13 @@ int main(int argc,char *argv[]){
 	}
 	in.close();
 	cout<<"D size:"<<D.size()<<endl;;
-	for(int i=0;i<DIM-1;i++){
+	for(int i=0;i<DIM;i++){
 		alpha[i] = D[i];
 		beta[i] = D[i+DIM];
 	}
-	cout<<beta[0]<<endl<<beta[DIM-1];
-	alpha[DIM-1] = D[DIM-1];
+	//alpha[DIM-1] = D[DIM-1];
 	D.clear();
+	cout<<beta[0]<<endl<<beta[DIM-1]<<endl;
 	cout<<"alpha.size: "<<alpha.size()<<endl
 		<<"beta.size: "<<beta.size()<<endl;	
 	//DCSub(alpha, beta, Q, D, 0, m-1);
@@ -83,7 +83,9 @@ int main(int argc,char *argv[]){
 	cout<<"rank = "<<rank<<endl;
 	cout<<endl;
 	cout<<"start calculating ..."<<endl;
+
 	resolve(A,rank,alpha,beta);//开始分解 
+	
 	finish = clock();
 	cout<<"used time:"<<(double)(finish-start)/CLOCKS_PER_SEC<<" s"<<endl;
 	char stop = getchar();
