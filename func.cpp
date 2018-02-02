@@ -6,8 +6,8 @@
 
 using namespace std;
 
-double EPS = 1e-14;
-double ZERO = 1e-6;
+double EPS = 1e-15;
+double ZERO = 1e-7;
 
 //转置
 void transpose(vector<vector<double> > &A,vector<vector<double> > &T){

@@ -1,16 +1,16 @@
-﻿import numpy as np 
+import numpy as np 
 
 f = np.loadtxt('./data50.txt')
 x = np.matrix(f)
-print x
+print(x)
 a = np.linalg.matrix_rank(x)
 print ('matrix rank:' , a)
 b = []
 c =[[]]
 b ,c = np.linalg.eig(x)
 b.sort()
-print ('eigenvalues are:\n', b)
-print ('eigenVectors are:\n',c)
+print('eigenvalues are:\n', b)
+print('eigenVectors are:\n',c)
 
 
 

@@ -6,15 +6,17 @@
 
 
 //特征方程求解
-vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, double sigma,int start,int end){
+vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, double sigma,int start,int end){//sigma=beta[start+end/2]
     int n=z.size();
     vector<double> res(n);
     //sort : d_0 < d_1 < ... < d_{n-1}
     vector<int> index;
     vector<double> d(n);
     merge_sort(D,index);//归并从小到大排序
-    if(sigma<0)
+    cout<<sigma<<endl;
+    if(sigma<0){
         reverse(index.begin(),index.end());
+    }
     vector<double> b(n);
     for(int i=0;i<n;i++){
         b[i]=z[index[i]];
@@ -25,24 +27,29 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
         vector<double> delta(d.size());
         for(int j=0;j<delta.size();j++){
 		    delta[j]=(d[j]-d[i])/sigma;
-			delta[j]= prezero(delta[j]);//去0
+            if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<d[i]<<d[j]<<endl;
+			//delta[j]= prezero(delta[j]);//去0
 		}
         double gamma=0;
         if(i+1<n){
             //gamma>1/delta[i+1]
-            double A=b[i]*b[i];
-            double B=-A/delta[i+1]-1;
+            double A = b[i]*b[i];
+            double B = -A/delta[i+1]-1;
 			A = prezero(A);
-            for(int j=0;j<delta.size();j++)
-                if(j!=i)
-                    B-=b[j]*b[j]/delta[j];
+            for(int j=0;j<delta.size();j++){
+                if(j!=i){//避免delta[j]=0
+                    B -= b[j]*b[j]/delta[j];
+                }
+            }
             double C=1.0;
-            for(int j=0;j<delta.size();j++)
-                if(j!=i)
-                    C+=b[j]*b[j]/delta[j];
-            C/=delta[i+1];
-            C-=b[i+1]*b[i+1]/delta[i+1];
-            gamma=(-B+sqrt(B*B-4*A*C))/(2*A);
+            for(int j=0;j<delta.size();j++){
+                if(j!=i){
+                    C += b[j]*b[j]/delta[j];
+                }
+            }
+            C /= delta[i+1];
+            C -= b[i+1]*b[i+1]/delta[i+1];
+            gamma = (-B+sqrt(B*B-4*A*C))/(2*A);
 			gamma = prezero(gamma);
         }
 			
@@ -53,20 +60,21 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             for(int j=0;j<n;j++){
 				double dg = delta[j]*gamma-1;
 				dg = prezero(dg);
-                g-=b[j]*b[j]/(dg*dg);
+                g -= b[j]*b[j]/(dg*dg);
             }
 			g = prezero(g); 
             double f=1;
             for(int j=0;j<n;j++){
 				double idg = delta[j]-1/gamma;
 				idg = prezero(idg);
-                f+=b[j]*b[j]/(idg);
+                f += b[j]*b[j]/(idg);
             }
             //f+g(newGamma-gamma)=0
-            double newGamma=-f/g+gamma;
+            double newGamma = gamma-f/g;
             diff=fabs(newGamma-gamma);
             gamma=newGamma;
         }
+        cout<<3<<endl;
         lambda[i]=sigma/gamma+d[i];
     }
 
@@ -110,8 +118,8 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
 		cout<<"lambda completed ."<<endl;	
         //对块内每个特征值计算局部特征向量 p = (D-\lambda I)^{-1} *z
         vector<vector<double> > P(n,vector<double>(n));//局部特征向量矩阵
+        vector<double> p(n);
         for(int i=0;i<n;i++){
-            vector<double> p(n);
             for(int j=0;j<n;j++){
                 double tem = D[j+start]-lambda[i];
                 p[j]= z[j]/prezero(tem);
@@ -121,11 +129,11 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
                 /*  if(start==250 && end == 499&& i>240){
                     cout<<D[j+start]<<" "<<lambda[i]<<" "<<z[j]<<" "<<p[j]<<endl;
                 }  */
-                }
-                normalize(p);
-                for(int j=0;j<n;j++){
-                    P[j][i]=p[j];
-                }
+            }
+            normalize(p);
+            for(int j=0;j<n;j++){
+                P[j][i]=p[j];
+            }
         }
         cout<<"P[][] completed."<<endl;
         vector<vector<double> > oldQ(n,vector<double>(n));
@@ -142,6 +150,7 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
                 }
             }
         }
+        //multiply(oldQ,P,Q);
 		cout<<"Q updating completed."<<endl;
         //Update D
         for(int i=0;i<n;i++){
@@ -175,7 +184,7 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         //lanczos(A,P,alpha,beta,l);//三对角化
         vector<vector<double> > W;
         vector<double> D(l,0);
-        vector<vector<double> > Q(l,vector<double>(0));
+        vector<vector<double> > Q(l,vector<double>(l,0));
 
         DCTridiagonal(alpha,beta,Q,D);//调用分治法分解
         
@@ -255,6 +264,6 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         
     }
     else{
-        cout<<"the input matrix is illegal"<<endl;
+        cout<<"the input matrix is illegal !"<<endl;
     }
 }
