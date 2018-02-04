@@ -27,22 +27,23 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
         vector<double> delta(d.size());
         for(int j=0;j<delta.size();j++){
 		    delta[j]=(d[j]-d[i])/sigma;
-            if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<d[i]<<d[j]<<endl;
-			//delta[j]= prezero(delta[j]);//去0
+            if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<" "<<d[i]<<d[j]<<endl; //delta[j] = prezero(delta[j]);
+            //delta[j] = prezero(delta[j]);//去0加入扰动
 		}
         double gamma=0;
         if(i+1<n){
             //gamma>1/delta[i+1]
-            double A = b[i]*b[i];
+            double A = b[i]*b[i];//A过小导致gamma无穷大
             double B = -A/delta[i+1]-1;
-			A = prezero(A);
-            for(int j=0;j<delta.size();j++){
+            if(A<EPS) A = ZERO;//cout<<"++++++++++++++++++++"<<i<<"++++++++++++++++++++"<<endl;
+			//A = prezero(A);
+            for(int j=0;j<delta.size() ;j++){
                 if(j!=i){//避免delta[j]=0
                     B -= b[j]*b[j]/delta[j];
                 }
             }
-            double C=1.0;
-            for(int j=0;j<delta.size();j++){
+            double C=1;
+            for(int j=0;j<delta.size() && j != i;j++){
                 if(j!=i){
                     C += b[j]*b[j]/delta[j];
                 }
@@ -50,32 +51,38 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             C /= delta[i+1];
             C -= b[i+1]*b[i+1]/delta[i+1];
             gamma = (-B+sqrt(B*B-4*A*C))/(2*A);
-			gamma = prezero(gamma);
+            cout<<"gamma"<<i<<" :"<<gamma<<endl;
+			//gamma = prezero(gamma);
         }
-			
         //牛顿法迭代求解
         double diff=1;
+        int count=0;
+        //出现牛顿法不收敛
         while(diff*diff>EPS){
             double g=0;
             for(int j=0;j<n;j++){
 				double dg = delta[j]*gamma-1;
-				dg = prezero(dg);
+				//dg = prezero(dg);
                 g -= b[j]*b[j]/(dg*dg);
             }
-			g = prezero(g); 
+			//g = prezero(g); 
             double f=1;
             for(int j=0;j<n;j++){
 				double idg = delta[j]-1/gamma;
-				idg = prezero(idg);
+				//idg = prezero(idg);
                 f += b[j]*b[j]/(idg);
             }
             //f+g(newGamma-gamma)=0
-            double newGamma = gamma-f/g;
+            double newGamma = -f/g + gamma;
             diff=fabs(newGamma-gamma);
             gamma=newGamma;
+            count++;
+            //if(count > 40000) break;
+          
         }
-        cout<<3<<endl;
-        lambda[i]=sigma/gamma+d[i];
+        cout<<"gamma"<<i<<" :"<<gamma<<endl;
+
+        lambda[i]=1/gamma*sigma+d[i];
     }
 
     for(int i=0;i<n;i++){
@@ -123,9 +130,6 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
             for(int j=0;j<n;j++){
                 double tem = D[j+start]-lambda[i];
                 p[j]= z[j]/prezero(tem);
-                /* if(_isnan(p[j])){//溢出或非确定性操作检测
-                    //cout<<j<<" ****IND***** "<<lambda[i];
-                } */
                 /*  if(start==250 && end == 499&& i>240){
                     cout<<D[j+start]<<" "<<lambda[i]<<" "<<z[j]<<" "<<p[j]<<endl;
                 }  */
@@ -206,7 +210,7 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         //load file P
         FILE *fc ;
         cout<<"read standard matrix :"<<endl;
-        fc = fopen("./ctest/P500.txt","r");
+        fc = fopen("./ctest/P50.txt","r");
 		if(!fc){
 			cout<<"open P file failed!"<<endl;
 		}

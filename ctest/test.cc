@@ -7,7 +7,7 @@
 
 using namespace std;
 int main(){
-	vector<int> b(50);
+	//vector<int> b(50);
 	/* FILE *fp;
 	int a[100];
 	fp = fopen("./data.txt","r");
@@ -39,22 +39,22 @@ int main(){
 	cout<<endl;
 	in.close();  */
 	ofstream ofile;
-	ofile.open("./AB500.txt",ios::out|ios::trunc);
-	/* for(int i=0;i<500;i++){
+	ofile.open("./rd500.txt",ios::out|ios::trunc);
+	for(int i=0;i<500;i++){
 		for(int j=0;j<500;j++){
-			if(j==i) {ofile << 4<<" ";}
-			else if(j==i+1 || j==i-1) {ofile <<1<<" ";}
-			else ofile << 0<<" ";
+			if(j==i) {ofile << i+1<<" ";}
+			else if(j==i+1 || j==i-1) {ofile <<i+2<<" ";}
+			else ofile << i+j<<" ";
 		}
 		ofile<<"\n";
-	} */
-	for(int i=0;i<500;i++){
-		ofile << 4 <<" ";
-	}
-	ofile << 0 <<" ";
-	for(int j=0;j<499;j++){
-		ofile << 1 <<" ";
-	}
+	} 
+	// for(int i=0;i<500;i++){
+	// 	ofile << 4 <<" ";
+	// }
+	// ofile << 0 <<" ";
+	// for(int j=0;j<499;j++){
+	// 	ofile << 1 <<" ";
+	// }
 	clock_t start, finish;
 	start = clock();
 	//sleep(3);//<unistd.h>

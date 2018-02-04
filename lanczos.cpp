@@ -40,7 +40,7 @@ void lanczos(SparseMatrix &A, vector<vector<double> > &P, vector<double> &alpha,
             }
         }
     }
-    FILE *fk = fopen("./ctest/P500.txt","w");//写入正交矩阵P
+    FILE *fk = fopen("./ctest/rd_P500.txt","w");//写入正交矩阵P
 	for(int i=0;i<m;++i){
 		for(int j=0;j<rank;++j){
 			fprintf(fk,"%.16lf ",P[i][j]);
@@ -48,7 +48,7 @@ void lanczos(SparseMatrix &A, vector<vector<double> > &P, vector<double> &alpha,
 		fprintf(fk,"%s","\n");
 	}
 	fclose(fk);
-    FILE *fab = fopen("./ctest/ab500.txt","w");//写入alpha
+    FILE *fab = fopen("./ctest/rd_ab500.txt","w");//写入alpha
 	for(int i=0;i<m;++i){
 		fprintf(fab,"%.16lf ",alpha[i]);	
 	}
@@ -65,7 +65,7 @@ int main(){
     A.cols = DIM;
     cout<<"loading data..."<<endl;
     FILE *fp;
-    fp = fopen("./ctest/data500.txt","r");
+    fp = fopen("./ctest/rd500.txt","r");
     if(!fp){
         cout<<"open file failed!"<<endl;
         return -1;
