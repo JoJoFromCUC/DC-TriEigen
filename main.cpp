@@ -9,7 +9,7 @@ license：GPL 3.0
 #include <fstream>
 #include <iomanip>
 #include "func.h"
-#define DIM 50
+#define DIM 1000
 using namespace std;
 
 int main(int argc,char *argv[]){
@@ -29,7 +29,7 @@ int main(int argc,char *argv[]){
 	//读入矩阵数据
 	cout<<"loading data..."<<endl;
 	FILE *fp;
-	fp = fopen("./ctest/data50.txt","r");
+	fp = fopen("./ctest/data1000.txt","r");
 	if(!fp){
 		cout<<" open matrix file failed!"<<endl;
 		return -1;
@@ -56,7 +56,7 @@ int main(int argc,char *argv[]){
 	vector<double> beta(DIM,0);
 	vector<vector<double> > Q;
     vector<double> D; 
-	ifstream in("./ctest/ab50.txt");//读取主对角、副对角元素
+	ifstream in("./ctest/ab1000.txt");//读取主对角、副对角元素
 	if(!in){
 		cout<<" open tri elements file failed!"<<endl;
 		return -1;

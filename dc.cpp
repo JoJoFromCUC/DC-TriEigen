@@ -9,7 +9,7 @@
 vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, double sigma,int start,int end){//sigma=beta[start+end/2]
     int n=z.size();
     vector<double> res(n);
-    //sort : d_0 < d_1 < ... < d_{n-1}
+    //sort d
     vector<int> index;
     vector<double> d(n);
     merge_sort(D,index);//归并从小到大排序
@@ -28,7 +28,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
         for(int j=0;j<delta.size();j++){
 		    delta[j]=(d[j]-d[i])/sigma;
             if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<" "<<d[i]<<d[j]<<endl; //delta[j] = prezero(delta[j]);
-            //delta[j] = prezero(delta[j]);//去0加入扰动
+            delta[j] = prezero(delta[j]);//加入扰动
 		}
         double gamma=0;
         if(i+1<n){
@@ -57,7 +57,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
         //牛顿法迭代求解
         double diff=1;
         int count=0;
-        //出现牛顿法不收敛
+        //出现不收敛情况
         while(diff*diff>EPS){
             double g=0;
             for(int j=0;j<n;j++){
@@ -210,7 +210,7 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         //load file P
         FILE *fc ;
         cout<<"read standard matrix :"<<endl;
-        fc = fopen("./ctest/P50.txt","r");
+        fc = fopen("./ctest/P1000.txt","r");
 		if(!fc){
 			cout<<"open P file failed!"<<endl;
 		}
