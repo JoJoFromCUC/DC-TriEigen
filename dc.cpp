@@ -26,8 +26,8 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
     for(int i=0;i<n;i++){
         vector<double> delta(d.size());
         for(int j=0;j<delta.size();j++){
-		    delta[j]=(d[j]-d[i])/sigma;
-            if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<" "<<d[i]<<d[j]<<endl; //delta[j] = prezero(delta[j]);
+		    delta[j]=(d[j]-d[i])/sigma;//d[j],d[i]太过接近时，出现问题需要处理
+            //if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<" "<<d[i]<<d[j]<<endl; //delta[j] = prezero(delta[j]);
             delta[j] = prezero(delta[j]);//加入扰动
 		}
         double gamma=0;
@@ -35,8 +35,8 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             //gamma>1/delta[i+1]
             double A = b[i]*b[i];//A过小导致gamma无穷大
             double B = -A/delta[i+1]-1;
-            if(A<EPS) A = ZERO;//cout<<"++++++++++++++++++++"<<i<<"++++++++++++++++++++"<<endl;
-			//A = prezero(A);
+            //if(A<EPS) A = ZERO;//cout<<"++++++++++++++++++++"<<i<<"++++++++++++++++++++"<<endl;
+			A = prezero(A);
             for(int j=0;j<delta.size() ;j++){
                 if(j!=i){//避免delta[j]=0
                     B -= b[j]*b[j]/delta[j];
