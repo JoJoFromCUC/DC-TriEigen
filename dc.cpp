@@ -100,8 +100,8 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
         int mid=(start+end)/2;  //划分
         alpha[mid]-=beta[mid+1];  //统一协调秩1修正矩阵
         alpha[mid+1]-=beta[mid+1];
-	     DCSub(alpha,beta,Q,D,start,mid);  //递归
-         DCSub(alpha,beta,Q,D,mid+1,end);
+	    DCSub(alpha,beta,Q,D,start,mid);  //递归
+        DCSub(alpha,beta,Q,D,mid+1,end);
 	    //cilk_sync;
         int n=end-start+1;//矩阵规模
         vector<double> z(n,0);
@@ -110,12 +110,20 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
         for(int i=mid+1;i<=end;i++)
             z[i-start]=Q[mid+1][i];	//子矩阵第一行
 
+        /*
+          z中对0元素处理的处理  
+        */    
+
+
         //计算矩阵 D+beta[mid+1]*z*z'的特征值
         vector<double> d(n,0);
         for(int i=0;i<n;i++){
             d[i]=D[i+start];//获得子矩阵特征值
         }
-		
+		/*
+        d[i]出现相同元素的处理
+        */
+        
         cout<<start<<" : "<<end<<endl;
         cout<<"z[],d[] completed ."<<endl;		
 		
