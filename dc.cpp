@@ -77,8 +77,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             diff=fabs(newGamma-gamma);
             gamma=newGamma;
             count++;
-            //if(count > 40000) break;
-          
+            //if(count > 40000) break; 
         }
         cout<<"gamma"<<i<<" :"<<gamma<<endl;
 
