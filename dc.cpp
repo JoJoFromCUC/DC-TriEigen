@@ -24,6 +24,11 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
     }
     vector<double> lambda(n);
     for(int i=0;i<n;i++){
+        //z[i]==0则直接得出特征值d[i]
+        if(b[i]==0){
+            lambda[i] = d[i];
+            continue;
+        }
         vector<double> delta(d.size());
         for(int j=0;j<delta.size();j++){
 		    delta[j]=(d[j]-d[i])/sigma;//d[j],d[i]太过接近时，出现问题需要处理
@@ -114,34 +119,45 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
           z中对0元素处理的处理  
         */    
 
-
         //计算矩阵 D+beta[mid+1]*z*z'的特征值
         vector<double> d(n,0);
         for(int i=0;i<n;i++){
             d[i]=D[i+start];//获得子矩阵特征值
         }
+
 		/*
         d[i]出现相同元素的处理
+        for i,j ;if(d[i]==d[j]) 执行givens变换 for z[i],z[j]
         */
-        
+        for(int i=0;i<n;i++){
+            for(int j=i+1;j<n;j++){
+                if(d[i]==d[j]) givens(i,j,theta);
+            }
+        }
+
         cout<<start<<" : "<<end<<endl;
         cout<<"z[],d[] completed ."<<endl;		
 		
         //计算特征方程 1 + sum_j \frac{z^2_j}{d_j-\lambda} =0 中lambda的值
-        vector<double> lambda = secularEquationSolver(z, d, beta[mid+1],start,end);//整合子矩阵特征值和修正矩阵特征值
+        vector<double> lambda = secularEquationSolver(z, d, beta[mid+1],start,end);//求解子矩阵特征值和修正矩阵特征值
 		cout<<"lambda completed ."<<endl;	
         //对块内每个特征值计算局部特征向量 p = (D-\lambda I)^{-1} *z
         vector<vector<double> > P(n,vector<double>(n));//局部特征向量矩阵
         vector<double> p(n);
         for(int i=0;i<n;i++){
+            if(lambda[i] == d[i]){//z[i]==0,则直接得出特征向量等于ei
+                for(int j=0;j<n;j++){
+                    if(j==i) P[j][i] = 1;
+                    P[j][i] = 0;
+                }
+                continue;
+            }
             for(int j=0;j<n;j++){
                 double tem = D[j+start]-lambda[i];
                 p[j]= z[j]/prezero(tem);
-                /*  if(start==250 && end == 499&& i>240){
-                    cout<<D[j+start]<<" "<<lambda[i]<<" "<<z[j]<<" "<<p[j]<<endl;
-                }  */
+                //cout<<D[j+start]<<" "<<lambda[i]<<" "<<z[j]<<" "<<p[j]<<endl;    
             }
-            normalize(p);
+            normalize(p);        //归一化
             for(int j=0;j<n;j++){
                 P[j][i]=p[j];
             }

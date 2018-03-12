@@ -107,6 +107,8 @@ double norm(const vector<double> &v);
 
 double dotProduct(const vector<double> &a, const vector<double> &b);
 
+
+
 // bool read_data(double local_a[],int local_n,int n,string vec_name,int myrank,MPI_Comm comm);
 
 // bool print_data(double local_a[],int local_n,int n,string title,int myrank,MPI_Comm comm);
