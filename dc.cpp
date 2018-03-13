@@ -7,86 +7,91 @@
 
 //特征方程求解
 vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, double sigma,int start,int end){//sigma=beta[start+end/2]
-    int n=z.size();
+    int n=z.size(),num;
     vector<double> res(n);
     //sort d
     vector<int> index;
     vector<double> d(n);
-    merge_sort(D,index);//归并从小到大排序
-    cout<<sigma<<endl;
+    vector<double> b(n);
+    vector<double> lambda(n);
+
+    merge_sort(D,index);   //排序
     if(sigma<0){
         reverse(index.begin(),index.end());
     }
-    vector<double> b(n);
+    vector<double> new_b;
+    vector<double> new_d;
     for(int i=0;i<n;i++){
         b[i]=z[index[i]];
         d[i]=D[index[i]];
-    }
-    vector<double> lambda(n);
-    for(int i=0;i<n;i++){
-        //z[i]==0则直接得出特征值d[i]
         if(b[i]==0){
-            lambda[i] = d[i];
-            continue;
-        }
-        vector<double> delta(d.size());
-        for(int j=0;j<delta.size();j++){
-		    delta[j]=(d[j]-d[i])/sigma;//d[j],d[i]太过接近时，出现问题需要处理
+           lambda[i] = d[i];
+           continue;
+        } //计算最后不同的对角元素个数
+        new_b.push_back(b[i]);
+        new_d.push_back(d[i]);
+    }
+    num = new_d.size();
+    cout<<"need to computer number"<<num<<endl;
+    for(int i=0;i<num;i++){
+        vector<double> delta(num);
+        for(int j=0;j<num;j++){
+		    delta[j]=(new_d[j]-new_d[i])/sigma;//d[j],d[i]太过接近时，出现问题需要处理
             //if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<" "<<d[i]<<d[j]<<endl; //delta[j] = prezero(delta[j]);
             delta[j] = prezero(delta[j]);//加入扰动
 		}
         double gamma=0;
         if(i+1<n){
             //gamma>1/delta[i+1]
-            double A = b[i]*b[i];//A过小导致gamma无穷大
+            double A = new_b[i]*new_b[i];//A过小导致gamma无穷大
             double B = -A/delta[i+1]-1;
             //if(A<EPS) A = ZERO;//cout<<"++++++++++++++++++++"<<i<<"++++++++++++++++++++"<<endl;
 			A = prezero(A);
-            for(int j=0;j<delta.size() ;j++){
+            for(int j=0;j<delta.size();j++){
                 if(j!=i){//避免delta[j]=0
-                    B -= b[j]*b[j]/delta[j];
+                    B -= new_b[j]*new_b[j]/delta[j];
                 }
             }
             double C=1;
-            for(int j=0;j<delta.size() && j != i;j++){
+            for(int j=0;j<delta.size();j++){
                 if(j!=i){
-                    C += b[j]*b[j]/delta[j];
+                    C += new_b[j]*new_b[j]/delta[j];
                 }
             }
             C /= delta[i+1];
-            C -= b[i+1]*b[i+1]/delta[i+1];
+            C -= new_b[i+1]*new_b[i+1]/delta[i+1];
             gamma = (-B+sqrt(B*B-4*A*C))/(2*A);
             cout<<"gamma"<<i<<" :"<<gamma<<endl;
-			//gamma = prezero(gamma);
+			gamma = prezero(gamma);
         }
         //牛顿法迭代求解
         double diff=1;
-        int count=0;
+        //int count=0;
         //出现不收敛情况
         while(diff*diff>EPS){
             double g=0;
-            for(int j=0;j<n;j++){
+            for(int j=0;j<num;j++){
 				double dg = delta[j]*gamma-1;
 				//dg = prezero(dg);
-                g -= b[j]*b[j]/(dg*dg);
+                g -= new_b[j]*new_b[j]/(dg*dg);
             }
-			//g = prezero(g); 
+			g = prezero(g); 
             double f=1;
-            for(int j=0;j<n;j++){
+            for(int j=0;j<num;j++){
 				double idg = delta[j]-1/gamma;
-				//idg = prezero(idg);
-                f += b[j]*b[j]/(idg);
+				idg = prezero(idg);
+                f += new_b[j]*new_b[j]/(idg);
             }
             //f+g(newGamma-gamma)=0
             double newGamma = -f/g + gamma;
             diff=fabs(newGamma-gamma);
             gamma=newGamma;
-            count++;
+            //count++;
             //if(count > 40000) break; 
         }
         cout<<"gamma"<<i<<" :"<<gamma<<endl;
 
-        lambda[i]=1/gamma*sigma+d[i];
+        lambda[i]=1/gamma*sigma + new_d[i];
     }
 
     for(int i=0;i<n;i++){
@@ -126,14 +131,14 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
         }
 
 		/*
-        d[i]出现相同元素的处理
-        for i,j ;if(d[i]==d[j]) 执行givens变换 for z[i],z[j]
-        */
+        d[i]出现相同或相近元素的处理
+        for i,j ;if(d[i]==d[j]) 执行givens变换 for z[i],z[j],
+        
         for(int i=0;i<n;i++){
             for(int j=i+1;j<n;j++){
-                if(d[i]==d[j]) givens(i,j,theta);
+                if( fabs(d[i]-d[j]) < EPS) givens(i,j,theta);
             }
-        }
+        }*/
 
         cout<<start<<" : "<<end<<endl;
         cout<<"z[],d[] completed ."<<endl;		
@@ -148,7 +153,7 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
             if(lambda[i] == d[i]){//z[i]==0,则直接得出特征向量等于ei
                 for(int j=0;j<n;j++){
                     if(j==i) P[j][i] = 1;
-                    P[j][i] = 0;
+                    else P[j][i] = 0;
                 }
                 continue;
             }

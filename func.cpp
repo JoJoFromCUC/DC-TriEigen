@@ -6,7 +6,7 @@
 
 using namespace std;
 
-double EPS = 1e-15;
+double EPS = 1e-12;
 double ZERO = 1e-6;
 
 //转置
