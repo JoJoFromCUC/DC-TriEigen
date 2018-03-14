@@ -41,7 +41,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             delta[j] = prezero(delta[j]);//加入扰动
 		}
         double gamma=0;
-        if(i+1<n){
+        if(i+1<num){
             //gamma>1/delta[i+1]
             double A = new_b[i]*new_b[i];//A过小导致gamma无穷大
             double B = -A/delta[i+1]-1;
@@ -136,7 +136,9 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
         
         for(int i=0;i<n;i++){
             for(int j=i+1;j<n;j++){
-                if( fabs(d[i]-d[j]) < EPS) givens(i,j,theta);
+                if( fabs(d[i]-d[j]) < EPS){
+                    
+                } //givens(i,j,theta);
             }
         }*/
 
