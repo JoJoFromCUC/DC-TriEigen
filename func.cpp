@@ -6,8 +6,9 @@
 
 using namespace std;
 
-double EPS = 1e-12;
-double ZERO = 1e-6;
+double EPS = 1e-14;
+double ZERO = 1e-8; 
+double GAP = 1e-8; //deflate condition
 
 //转置
 void transpose(vector<vector<double> > &A,vector<vector<double> > &T){

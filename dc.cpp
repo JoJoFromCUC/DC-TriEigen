@@ -24,19 +24,22 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
     for(int i=0;i<n;i++){
         b[i]=z[index[i]];
         d[i]=D[index[i]];
-        if(b[i]==0){
+        if(b[i]==0){  //直接得出
            lambda[i] = d[i];
            continue;
-        } //计算最后不同的对角元素个数
-        new_b.push_back(b[i]);
+        } 
+        new_b.push_back(b[i]); 
         new_d.push_back(d[i]);
     }
+    // for(int i=0;i<n;i++){
+    //     cout<<new_b[i]<<" "<<new_d[i]<<endl;
+    // }
     num = new_d.size();
-    cout<<"need to computer number"<<num<<endl;
+    cout<<"need to computer number:"<<num<<endl;
     for(int i=0;i<num;i++){
         vector<double> delta(num);
         for(int j=0;j<num;j++){
-		    delta[j]=(new_d[j]-new_d[i])/sigma;//d[j],d[i]太过接近时，出现问题需要处理
+		    delta[j]=(new_d[j]-new_d[i])/sigma;//d[j],d[i]太过接近时需要处理
             //if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<" "<<d[i]<<d[j]<<endl; //delta[j] = prezero(delta[j]);
             delta[j] = prezero(delta[j]);//加入扰动
 		}
@@ -62,7 +65,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             C -= new_b[i+1]*new_b[i+1]/delta[i+1];
             gamma = (-B+sqrt(B*B-4*A*C))/(2*A);
             cout<<"gamma"<<i<<" :"<<gamma<<endl;
-			gamma = prezero(gamma);
+			//gamma = prezero(gamma);
         }
         //牛顿法迭代求解
         double diff=1;
@@ -89,7 +92,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             //count++;
             //if(count > 40000) break; 
         }
-        cout<<"gamma"<<i<<" :"<<gamma<<endl;
+        //cout<<"gamma"<<i<<" :"<<gamma<<endl;
 
         lambda[i]=1/gamma*sigma + new_d[i];
     }
@@ -132,34 +135,41 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
 
 		/*
         d[i]出现相同或相近元素的处理
-        for i,j ;if(d[i]==d[j]) 执行givens变换 for z[i],z[j],
-        
+        执行givens变换 for z[i],z[j]
+        */
+        bool flag = false;
+        vector<vector<double> > givens(n,vector<double>(n,0));
         for(int i=0;i<n;i++){
+            givens[i][i] = 1;
             for(int j=i+1;j<n;j++){
-                if( fabs(d[i]-d[j]) < EPS){
-                    
-                } //givens(i,j,theta);
+                if( fabs(d[i]-d[j]) < GAP){
+                    flag = true;
+                    givens[i][i] = givens[j][j] = givens[i][j] = 0.7071;
+                    givens[j][i] = -0.7071;
+                    z[i] = sqrt(z[i]*z[i]+z[j]*z[j]);
+                    z[j] = 0;
+                } //givens(i,j,PI/4);
             }
-        }*/
-
+        }
         cout<<start<<" : "<<end<<endl;
         cout<<"z[],d[] completed ."<<endl;		
 		
         //计算特征方程 1 + sum_j \frac{z^2_j}{d_j-\lambda} =0 中lambda的值
-        vector<double> lambda = secularEquationSolver(z, d, beta[mid+1],start,end);//求解子矩阵特征值和修正矩阵特征值
+        vector<double> lambda = secularEquationSolver(z, d, beta[mid+1],start,end);//求解合并后的特征值
 		cout<<"lambda completed ."<<endl;	
         //对块内每个特征值计算局部特征向量 p = (D-\lambda I)^{-1} *z
-        vector<vector<double> > P(n,vector<double>(n));//局部特征向量矩阵
+        vector<vector<double> > P(n,vector<double>(n,0));//局部特征向量矩阵
         vector<double> p(n);
         for(int i=0;i<n;i++){
-            if(lambda[i] == d[i]){//z[i]==0,则直接得出特征向量等于ei
-                for(int j=0;j<n;j++){
-                    if(j==i) P[j][i] = 1;
-                    else P[j][i] = 0;
-                }
+            if(z[i] == 0){//z[i]==0,则直接得出特征向量等于ei
+                // for(int j=0;j<n;j++){
+                //     if(j==i) P[j][i] = 1;
+                //     else P[j][i] = 0;
+                // }
+                P[i][i] = 1;
                 continue;
             }
-            for(int j=0;j<n;j++){
+            for(int j=0;j<n;j++){ //求解特征向量存在问题
                 double tem = D[j+start]-lambda[i];
                 p[j]= z[j]/prezero(tem);
                 //cout<<D[j+start]<<" "<<lambda[i]<<" "<<z[j]<<" "<<p[j]<<endl;    
@@ -175,7 +185,23 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
             for(int j=0;j<n;j++){
                 oldQ[i][j]=Q[i+start][j+start];
             }
-        }       
+        }  
+        if(flag){
+            vector<vector<double> > tempQ(n,vector<double>(n));
+            for(int i=0;i<n;i++){	//multiply givens;
+                for(int j=0;j<n;j++){
+                    //temp[i+start][j+start]=0;
+                    for(int k=0;k<n;k++){
+                        tempQ[i][j]+=oldQ[i][k]*givens[k][j];
+                    }
+                }
+            }
+            for(int i=0;i<n;i++){
+                for(int j=0;j<n;j++){
+                    oldQ[i][j]=tempQ[i][j];
+                }
+            }  
+        }     
         for(int i=0;i<n;i++){	//update Q
             for(int j=0;j<n;j++){
                 Q[i+start][j+start]=0;
@@ -184,7 +210,6 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
                 }
             }
         }
-        //multiply(oldQ,P,Q);
 		cout<<"Q updating completed."<<endl;
         //Update D
         for(int i=0;i<n;i++){

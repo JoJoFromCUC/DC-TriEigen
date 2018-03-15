@@ -6,6 +6,7 @@ using namespace std;
 
 extern double EPS ; //精度
 extern double ZERO ;//0
+extern double GAP; //deflation condition
 
 class Cell{//矩阵元素
 public:
