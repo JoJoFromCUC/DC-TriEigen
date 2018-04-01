@@ -24,11 +24,11 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
     for(int i=0;i<n;i++){
         b[i]=z[index[i]];
         d[i]=D[index[i]];
-        if(b[i]==0){  //直接得出
+        if(b[i]==0){  //直接得出特征值
            lambda[i] = d[i];
            continue;
         } 
-        new_b.push_back(b[i]); 
+        new_b.push_back(b[i]); //获取不重复的d和不为0的b
         new_d.push_back(d[i]);
     }
     // for(int i=0;i<n;i++){
@@ -82,7 +82,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             double f=1;
             for(int j=0;j<num;j++){
 				double idg = delta[j]-1/gamma;
-				idg = prezero(idg);
+				//idg = prezero(idg);
                 f += new_b[j]*new_b[j]/(idg);
             }
             //f+g(newGamma-gamma)=0
@@ -144,11 +144,11 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
             for(int j=i+1;j<n;j++){
                 if( fabs(d[i]-d[j]) < GAP){
                     flag = true;
-                    givens[i][i] = givens[j][j] = givens[i][j] = 0.7071;
+                    givens[i][i] = givens[j][j] = givens[i][j] = 0.7071; //givens(i,j,PI/4);
                     givens[j][i] = -0.7071;
                     z[i] = sqrt(z[i]*z[i]+z[j]*z[j]);
                     z[j] = 0;
-                } //givens(i,j,PI/4);
+                } 
             }
         }
         cout<<start<<" : "<<end<<endl;
@@ -169,7 +169,7 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
                 P[i][i] = 1;
                 continue;
             }
-            for(int j=0;j<n;j++){ //求解特征向量存在问题
+            for(int j=0;j<n;j++){ //求解特征向量存在问题,需要使用新的公式
                 double tem = D[j+start]-lambda[i];
                 p[j]= z[j]/prezero(tem);
                 //cout<<D[j+start]<<" "<<lambda[i]<<" "<<z[j]<<" "<<p[j]<<endl;    
