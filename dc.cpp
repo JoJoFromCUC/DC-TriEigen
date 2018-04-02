@@ -9,12 +9,11 @@
 vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, double sigma,int start,int end){//sigma=beta[start+end/2]
     int n=z.size(),num;
     vector<double> res(n);
-    //sort d
     vector<int> index;
     vector<double> d(n);
     vector<double> b(n);
     vector<double> lambda(n);
-
+    
     merge_sort(D,index);   //排序
     if(sigma<0){
         reverse(index.begin(),index.end());
@@ -25,7 +24,6 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
         b[i]=z[index[i]];
         d[i]=D[index[i]];
         if(b[i]==0){  //直接得出特征值
-           lambda[i] = d[i];
            continue;
         } 
         new_b.push_back(b[i]); //获取不重复的d和不为0的b
@@ -36,11 +34,13 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
     // }
     num = new_d.size();
     cout<<"need to computer number:"<<num<<endl;
+    vector<double> tem_lambda(num); //除去相同或相似元素后的局部特征向量
+
     for(int i=0;i<num;i++){
         vector<double> delta(num);
         for(int j=0;j<num;j++){
 		    delta[j]=(new_d[j]-new_d[i])/sigma;//d[j],d[i]太过接近时需要处理
-            //if(delta[j]==0 && j!=i) cout<<"i j"<<i<<j<<" "<<d[i]<<d[j]<<endl; //delta[j] = prezero(delta[j]);
+            //if(delta[j] <ZERO  && j!=i) cout<<"i j"<<i<<j<<" "<<new_d[i]<<" "<<new_d[j]<<endl; //delta[j] = prezero(delta[j]);
             delta[j] = prezero(delta[j]);//加入扰动
 		}
         double gamma=0;
@@ -65,7 +65,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             C -= new_b[i+1]*new_b[i+1]/delta[i+1];
             gamma = (-B+sqrt(B*B-4*A*C))/(2*A);
             cout<<"gamma"<<i<<" :"<<gamma<<endl;
-			//gamma = prezero(gamma);
+			gamma = prezero(gamma);
         }
         //牛顿法迭代求解
         double diff=1;
@@ -94,11 +94,19 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
         }
         //cout<<"gamma"<<i<<" :"<<gamma<<endl;
 
-        lambda[i]=1/gamma*sigma + new_d[i];
+        tem_lambda[i] = 1/gamma*sigma + new_d[i];
     }
-
+    int pos = 0;
     for(int i=0;i<n;i++){
-        res[index[i]]=lambda[i];
+        if(b[i]==0){  //直接得出特征值
+           lambda[i] = d[i];
+           continue;
+        } 
+        lambda[i] = tem_lambda[pos];
+        pos++;
+    }
+    for(int i=0;i<n;i++){
+        res[index[i]] = lambda[i];
     }
     return res;
 }
@@ -138,7 +146,7 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
         执行givens变换 for z[i],z[j]
         */
         bool flag = false;
-        vector<vector<double> > givens(n,vector<double>(n,0));
+        vector<vector<double> > givens(n,vector<double>(n,0));//生成givens矩阵
         for(int i=0;i<n;i++){
             givens[i][i] = 1;
             for(int j=i+1;j<n;j++){
@@ -169,7 +177,11 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
                 P[i][i] = 1;
                 continue;
             }
-            for(int j=0;j<n;j++){ //求解特征向量存在问题,需要使用新的公式
+
+            /*
+            求解特征向量存在问题,需要使用新的公式先更新z的值
+            */
+            for(int j=0;j<n;j++){ 
                 double tem = D[j+start]-lambda[i];
                 p[j]= z[j]/prezero(tem);
                 //cout<<D[j+start]<<" "<<lambda[i]<<" "<<z[j]<<" "<<p[j]<<endl;    
@@ -265,7 +277,7 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         //load file P
         FILE *fc ;
         cout<<"read standard matrix :"<<endl;
-        fc = fopen("./ctest/P1000.txt","r");
+        fc = fopen("./ctest/P500.txt","r");
 		if(!fc){
 			cout<<"open P file failed!"<<endl;
 		}
