@@ -179,6 +179,8 @@ void DCSub(vector<double> &alpha, vector<double> &beta, vector<vector<double> > 
             }
 
             /*
+            update z[]
+
             求解特征向量存在问题,需要使用新的公式先更新z的值
             */
             for(int j=0;j<n;j++){ 
