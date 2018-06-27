@@ -3,6 +3,8 @@ author: JoeZhu
 time: Oct 2nd,2017
 institution: UCAS
 license：GPL 3.0
+description: this program compute the eigen values and 
+eigen vector for a tridiagonal matrix
 */
 #include <iostream>
 #include <time.h>
@@ -78,16 +80,11 @@ int main(int argc,char *argv[]){
 	cout<<"alpha.size: "<<alpha.size()<<endl
 		<<"beta.size: "<<beta.size()<<endl;	
 	//DCSub(alpha, beta, Q, D, 0, m-1);
-	clock_t start,finish;//计时
-	start = clock();	
+		
 	cout<<"rank = "<<rank<<endl;
 	cout<<endl;
 	cout<<"start calculating ..."<<endl;
-
 	resolve(A,rank,alpha,beta);//开始分解 
-	
-	finish = clock();
-	cout<<"used time:"<<(double)(finish-start)/CLOCKS_PER_SEC<<" s"<<endl;
 	char stop = getchar();
 	//MPI::Finalize();
     return 0;

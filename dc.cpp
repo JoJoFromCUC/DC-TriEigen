@@ -3,7 +3,7 @@
 #include <cmath>
 #include <algorithm>
 #include <fstream>
-
+#include <time.h>
 
 //特征方程求解
 vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, double sigma,int start,int end){//sigma=beta[start+end/2]
@@ -258,7 +258,8 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         vector<vector<double> > W;
         vector<double> D(l,0);
         vector<vector<double> > Q(l,vector<double>(l,0));
-
+        clock_t start,finish;//计时
+	    start = clock();
         DCTridiagonal(alpha,beta,Q,D);//调用分治法分解
         
         vector<int> index;	//排序后索引
@@ -272,6 +273,8 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
                 W[i][j]=Q[i][index[j]];	//改变原Q的顺序赋给W
             }
         }
+        finish = clock();
+	    cout<<"used time:"<<(double)(finish-start)/CLOCKS_PER_SEC<<" s"<<endl;
         //print(W);
 		// for(int i=0;i<m;i++){
 		// 	cout<<W[0][i]<<endl;
