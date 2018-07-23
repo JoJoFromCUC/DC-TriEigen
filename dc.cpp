@@ -64,7 +64,7 @@ vector<double> secularEquationSolver(vector<double> &z, vector<double> &D, doubl
             C /= delta[i+1];
             C -= new_b[i+1]*new_b[i+1]/delta[i+1];
             gamma = (-B+sqrt(B*B-4*A*C))/(2*A);
-            cout<<"gamma"<<i<<" :"<<gamma<<endl;
+            //cout<<"gamma"<<i<<" :"<<gamma<<endl;
 			gamma = prezero(gamma);
         }
         //牛顿法迭代求解
@@ -282,7 +282,7 @@ void resolve(SparseMatrix &A, int r,vector<double> &alpha,vector<double> &beta){
         //load file P
         FILE *fc ;
         cout<<"read standard matrix :"<<endl;
-        fc = fopen("./ctest/P500.txt","r");
+        fc = fopen("./ctest/P1000.txt","r");
 		if(!fc){
 			cout<<"open P file failed!"<<endl;
 		}
